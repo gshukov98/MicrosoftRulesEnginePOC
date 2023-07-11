@@ -38,7 +38,7 @@ namespace RulesEngine.Service
 
             resultSuccessful.OnFail(() =>
             {
-                _logger.LogInformation("Failed to achieve discount");
+                _logger.LogInformation("Failed to achieve discount.");
             });
         }
 

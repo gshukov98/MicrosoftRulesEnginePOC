@@ -2,6 +2,30 @@
 
 namespace RulesEngineTestProject;
 
+public static class VipMemberUtils
+{
+    public static bool IsVipMember(string userId, bool isVip)
+    {
+        return isVip;
+    }
+}
+
+public static class OrderTypeUtils
+{
+    public static bool IsOnetimeOrder(string userId, bool isOnetimeOrder)
+    {
+        return isOnetimeOrder;
+    }
+}
+
+public static class RefundedOrderUtils
+{
+    public static bool IsRefundedOrder(string userId, bool isRefunded)
+    {
+        return isRefunded;
+    }
+}
+
 public class PersonalEverydayOrderRulesEngine
 {
     public RulesEngine.RulesEngine ConstructRulesEngine()
@@ -11,7 +35,12 @@ public class PersonalEverydayOrderRulesEngine
             PersonalEverydayOrderWorkflow()
         };
 
-        return new RulesEngine.RulesEngine(workflows.ToArray());
+        ReSettings reSettingsWithCustomTypes = new ReSettings
+        {
+            CustomTypes = new Type[] { typeof(VipMemberUtils), typeof(OrderTypeUtils), typeof(RefundedOrderUtils) }
+        };
+
+        return new RulesEngine.RulesEngine(workflows.ToArray(), reSettingsWithCustomTypes);
     }
 
     private Workflow PersonalEverydayOrderWorkflow()
@@ -25,6 +54,7 @@ public class PersonalEverydayOrderRulesEngine
 
     private Rule PersonalEverydayOrderRule()
     {
+        //Top level rule
         Rule personalEverydayOrderRule = new Rule();
         personalEverydayOrderRule.RuleName = "PersonalEverydayOrder";
         personalEverydayOrderRule.RuleExpressionType = RuleExpressionType.LambdaExpression;
@@ -32,13 +62,43 @@ public class PersonalEverydayOrderRulesEngine
         personalEverydayOrderRule.SuccessEvent = "1";
         personalEverydayOrderRule.ErrorMessage = "Order not qualified.";
 
+        // Nested rules
         List<Rule> nestedRules = new List<Rule>();
         IsVipRule(nestedRules);
         IsOnetimeOrderRule(nestedRules);
         IsNotRefundedRule(nestedRules);
 
+        //Local params (used for expressions in nested rules)
+        personalEverydayOrderRule.LocalParams = GetLocalParams();
+
         personalEverydayOrderRule.Rules = nestedRules;
         return personalEverydayOrderRule;
+    }
+
+    private static List<LocalParam> GetLocalParams()
+    {
+        List<LocalParam> localParams = new List<LocalParam>();
+        LocalParam vipMemberLocalParam = new LocalParam()
+        {
+            Name = "checkVipMember",
+            Expression = "VipMemberUtils.IsVipMember(input1.UserId,input1.IsVip) == true"
+        };
+        localParams.Add(vipMemberLocalParam);
+
+        LocalParam isOnetimeOrderLocalParam = new LocalParam()
+        {
+            Name = "checkOrderType",
+            Expression = "OrderTypeUtils.IsOnetimeOrder(input1.UserId,input1.IsOnetimeOrder) == true"
+        };
+        localParams.Add(isOnetimeOrderLocalParam);
+
+        LocalParam isRefundedOrderLocalParam = new LocalParam()
+        {
+            Name = "checkOrderRefund",
+            Expression = "RefundedOrderUtils.IsRefundedOrder(input1.UserId,input1.IsRefunded) == false"
+        };
+        localParams.Add(isRefundedOrderLocalParam);
+        return localParams;
     }
 
     private static void IsVipRule(List<Rule> nestedRules)
@@ -47,7 +107,7 @@ public class PersonalEverydayOrderRulesEngine
         isVipUserRule.RuleName = "IsVipUser";
         isVipUserRule.RuleExpressionType = RuleExpressionType.LambdaExpression;
         isVipUserRule.ErrorMessage = "User is not VIP.";
-        isVipUserRule.Expression = "input1.IsVip == true";
+        isVipUserRule.Expression = "checkVipMember";
         nestedRules.Add(isVipUserRule);
     }
 
@@ -57,7 +117,7 @@ public class PersonalEverydayOrderRulesEngine
         isOnetimeOrderRule.RuleName = "IsOnetimeOrder";
         isOnetimeOrderRule.RuleExpressionType = RuleExpressionType.LambdaExpression;
         isOnetimeOrderRule.ErrorMessage = "Order is not with proper type.";
-        isOnetimeOrderRule.Expression = "input1.IsOnetimeOrder == true";
+        isOnetimeOrderRule.Expression = "checkOrderType";
         nestedRules.Add(isOnetimeOrderRule);
     }
 
@@ -67,7 +127,7 @@ public class PersonalEverydayOrderRulesEngine
         isNotRefundedRule.RuleName = "IsNotRefundedOrder";
         isNotRefundedRule.RuleExpressionType = RuleExpressionType.LambdaExpression;
         isNotRefundedRule.ErrorMessage = "Order was refunded.";
-        isNotRefundedRule.Expression = "input1.IsRefunded == false";
+        isNotRefundedRule.Expression = "checkOrderRefund";
         nestedRules.Add(isNotRefundedRule);
     }
 }
