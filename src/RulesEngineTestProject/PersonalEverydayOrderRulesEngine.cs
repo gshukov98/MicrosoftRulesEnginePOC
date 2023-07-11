@@ -2,30 +2,6 @@
 
 namespace RulesEngineTestProject;
 
-public static class VipMemberUtils
-{
-    public static bool IsVipMember(string userId, bool isVip)
-    {
-        return isVip;
-    }
-}
-
-public static class OrderTypeUtils
-{
-    public static bool IsOnetimeOrder(string userId, bool isOnetimeOrder)
-    {
-        return isOnetimeOrder;
-    }
-}
-
-public static class RefundedOrderUtils
-{
-    public static bool IsRefundedOrder(string userId, bool isRefunded)
-    {
-        return isRefunded;
-    }
-}
-
 public class PersonalEverydayOrderRulesEngine
 {
     public RulesEngine.RulesEngine ConstructRulesEngine()
@@ -81,7 +57,7 @@ public class PersonalEverydayOrderRulesEngine
         LocalParam vipMemberLocalParam = new LocalParam()
         {
             Name = "checkVipMember",
-            Expression = "VipMemberUtils.IsVipMember(input1.UserId,input1.IsVip) == true"
+            Expression = "VipMemberUtils.IsVipMember(input1.UserId,input1.Provider) == true"
         };
         localParams.Add(vipMemberLocalParam);
 

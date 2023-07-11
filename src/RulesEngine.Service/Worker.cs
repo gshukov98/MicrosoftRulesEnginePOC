@@ -7,10 +7,12 @@ namespace RulesEngine.Service
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
+        private readonly IServiceProvider _provider;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(ILogger<Worker> logger, IServiceProvider provider)
         {
             _logger = logger;
+            _provider = provider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,7 +28,7 @@ namespace RulesEngine.Service
 
         private async Task SucessfulAsync(RulesEngine rulesEngine)
         {
-            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", true, true, false);
+            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("124", true, false, _provider);
             List<RuleResultTree> resultSuccessful = await rulesEngine.ExecuteAllRulesAsync("Personal Everyday Order Workflow", successfulInput);
 
             _logger.LogInformation("Executing with successful input.");
@@ -44,7 +46,7 @@ namespace RulesEngine.Service
 
         private async Task FailedUserIsNotVipAsync(RulesEngine rulesEngine)
         {
-            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", false, true, false);
+            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", true, false, _provider);
             List<RuleResultTree> resultSuccessful = await rulesEngine.ExecuteAllRulesAsync("Personal Everyday Order Workflow", successfulInput);
 
             _logger.LogInformation("Executing with not vip user.");
@@ -62,7 +64,7 @@ namespace RulesEngine.Service
 
         private async Task FailedNotOnetimeOrderAsync(RulesEngine rulesEngine)
         {
-            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", true, false, false);
+            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("124", false, false, _provider);
             List<RuleResultTree> resultSuccessful = await rulesEngine.ExecuteAllRulesAsync("Personal Everyday Order Workflow", successfulInput);
 
             _logger.LogInformation("Executing with not onetime order.");
@@ -80,7 +82,7 @@ namespace RulesEngine.Service
 
         private async Task FailedRefundedOrderAsync(RulesEngine rulesEngine)
         {
-            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", true, true, true);
+            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("124", true, true, _provider);
             List<RuleResultTree> resultSuccessful = await rulesEngine.ExecuteAllRulesAsync("Personal Everyday Order Workflow", successfulInput);
 
             _logger.LogInformation("Executing with refunded order.");
@@ -98,7 +100,7 @@ namespace RulesEngine.Service
 
         private async Task FailedAllNestedRulesFailedAsync(RulesEngine rulesEngine)
         {
-            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", false, false, true);
+            PersonalEverydayOrderInput successfulInput = new PersonalEverydayOrderInput("123", false, true, _provider);
             List<RuleResultTree> resultSuccessful = await rulesEngine.ExecuteAllRulesAsync("Personal Everyday Order Workflow", successfulInput);
 
             _logger.LogInformation("Executing with all rules failed.");
