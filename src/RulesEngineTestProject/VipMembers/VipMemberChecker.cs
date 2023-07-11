@@ -1,4 +1,4 @@
-﻿namespace RulesEngineTestProject;
+﻿namespace RulesEngineTestProject.VipMembers;
 
 public class VipMemberChecker
 {

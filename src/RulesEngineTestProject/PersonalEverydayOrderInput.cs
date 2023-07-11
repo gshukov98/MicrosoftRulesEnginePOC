@@ -2,19 +2,16 @@
 
 public class PersonalEverydayOrderInput
 {
-    public PersonalEverydayOrderInput(string userId, bool isOnetimeOrder, bool isRefunded, IServiceProvider provider)
+    public PersonalEverydayOrderInput(string userId, string orderId, IServiceProvider provider)
     {
         UserId = userId;
-        IsOnetimeOrder = isOnetimeOrder;
-        IsRefunded = isRefunded;
+        OrderId = orderId;
         Provider = provider;
     }
 
     public string UserId { get; private set; }
 
-    public bool IsOnetimeOrder { get; private set; }
-
-    public bool IsRefunded { get; private set; }
+    public string OrderId { get; private set; }
 
     public IServiceProvider Provider { get; private set; }
 }

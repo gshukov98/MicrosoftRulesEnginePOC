@@ -1,4 +1,7 @@
 ﻿using RulesEngine.Models;
+using RulesEngineTestProject.OrdersRefund;
+using RulesEngineTestProject.OrdersType;
+using RulesEngineTestProject.VipMembers;
 
 namespace RulesEngineTestProject;
 
@@ -64,14 +67,14 @@ public class PersonalEverydayOrderRulesEngine
         LocalParam isOnetimeOrderLocalParam = new LocalParam()
         {
             Name = "checkOrderType",
-            Expression = "OrderTypeUtils.IsOnetimeOrder(input1.UserId,input1.IsOnetimeOrder) == true"
+            Expression = "OrderTypeUtils.IsOnetimeOrder(input1.UserId,input1.OrderId,input1.Provider) == true"
         };
         localParams.Add(isOnetimeOrderLocalParam);
 
         LocalParam isRefundedOrderLocalParam = new LocalParam()
         {
             Name = "checkOrderRefund",
-            Expression = "RefundedOrderUtils.IsRefundedOrder(input1.UserId,input1.IsRefunded) == false"
+            Expression = "RefundedOrderUtils.IsRefundedOrder(input1.UserId,input1.OrderId,input1.Provider) == false"
         };
         localParams.Add(isRefundedOrderLocalParam);
         return localParams;

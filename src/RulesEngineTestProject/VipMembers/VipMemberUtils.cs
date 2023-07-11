@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace RulesEngineTestProject;
+namespace RulesEngineTestProject.VipMembers;
 
 public static class VipMemberUtils
 {
